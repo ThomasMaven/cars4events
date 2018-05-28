@@ -55,7 +55,7 @@ CREATE TABLE public.event
   owner_id integer NOT NULL,
   car_id integer NOT NULL,
   departure character varying(1000),
-  return character varying(1000),
+  back character varying(1000),
 
   CONSTRAINT event_pkey PRIMARY KEY (id),
   CONSTRAINT owner_id_fk FOREIGN KEY (owner_id)
