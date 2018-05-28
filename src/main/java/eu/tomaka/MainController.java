@@ -1,5 +1,8 @@
-package eu.tomaka.controller;
+package eu.tomaka;
 
+import eu.tomaka.model.Person;
+import eu.tomaka.service.PersonService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,6 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @EnableAutoConfiguration
 @RequestMapping("/")
 public class MainController {
+
+    @Autowired
+    PersonService personService;
 
     private Facebook facebook;
     private ConnectionRepository connectionRepository;
@@ -41,7 +47,8 @@ public class MainController {
         model.addAttribute("first_name", profile.getFirstName());
         model.addAttribute("last_name", profile.getLastName());
         model.addAttribute("email", profile.getEmail());
-
+        Person person = new Person(profile.getFirstName(), profile.getLastName(), profile.getId(), profile.getEmail());
+        personService.putUser(person);
         return "hello";
     }
 
