@@ -9,17 +9,17 @@ public class Person {
     private Long id;
     private String name;
     private String surname;
-    @Column(unique=true)
-    private String fb_id;
+    @Column(unique=true, name = "fb_id")
+    private String fbid;
     private String email;
 
     public Person() {
 
     }
-    public Person(String name, String surname, String fb_id, String email) {
+    public Person(String name, String surname, String fbid, String email) {
         this.name = name;
         this.surname = surname;
-        this.fb_id = fb_id;
+        this.fbid = fbid;
         this.email = email;
     }
 
@@ -47,12 +47,12 @@ public class Person {
         this.surname = surname;
     }
 
-    public String getFb_id() {
-        return fb_id;
+    public String getFbid() {
+        return fbid;
     }
 
-    public void setFb_id(String fb_id) {
-        this.fb_id = fb_id;
+    public void setFbid(String fbid) {
+        this.fbid = fbid;
     }
 
     public String getEmail() {
