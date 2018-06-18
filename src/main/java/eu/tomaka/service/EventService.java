@@ -1,6 +1,7 @@
 package eu.tomaka.service;
 
 import eu.tomaka.model.Event;
+import eu.tomaka.model.Person;
 import eu.tomaka.repo.EventRepo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,6 @@ public class EventService {
         return eventToDel;
     }
 
-
     @Transactional
     public Event updateEvent(Long id, Event event) {
         Event existingEvent = eventRepo.findOne(id);
@@ -43,5 +43,13 @@ public class EventService {
         return eventRepo.saveAndFlush(existingEvent);
     }
 
+    @Transactional
+    public Event addPerson(Long id, Person person) {
+        Event existingEvent = eventRepo.findOne(id);
+        List<Person> updatedPersonList = existingEvent.getPersonList();
+        updatedPersonList.add(person);
+        existingEvent.setPersonList(updatedPersonList);
+        return eventRepo.saveAndFlush(existingEvent);
+    }
 
 }

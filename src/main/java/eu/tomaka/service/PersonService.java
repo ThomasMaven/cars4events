@@ -13,9 +13,19 @@ import java.util.List;
 public class PersonService {
     @Autowired
     private PersonRepo personRepo;
-    
+
     @Transactional
-    public Person putUser(Person person) {
+    public List<Person> findAll() {
+        return personRepo.findAll();
+    }
+
+    @Transactional
+    public Person findOne(Long id) {
+        return personRepo.findOne(id);
+    }
+
+    @Transactional
+    public Person putPerson(Person person) {
         Person existingPerson = personRepo.findByFbid(person.getFbid()).orElse(null);
         if (existingPerson != null) {
             person.setId(existingPerson.getId());
@@ -24,5 +34,7 @@ public class PersonService {
         }
         return personRepo.saveAndFlush(person);
     }
+
+
 
 }

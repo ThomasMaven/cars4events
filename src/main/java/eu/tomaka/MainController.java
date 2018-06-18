@@ -48,7 +48,7 @@ public class MainController {
         model.addAttribute("last_name", profile.getLastName());
         model.addAttribute("email", profile.getEmail());
         Person person = new Person(profile.getFirstName(), profile.getLastName(), profile.getId(), profile.getEmail());
-        personService.putUser(person);
+        personService.putPerson(person);
         return "hello";
     }
 

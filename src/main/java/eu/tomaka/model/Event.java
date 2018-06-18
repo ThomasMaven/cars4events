@@ -1,6 +1,7 @@
 package eu.tomaka.model;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Event {
@@ -9,7 +10,8 @@ public class Event {
     private Long id;
     private String name;
     private Long owner_id;
-    //TODO: add user list
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Person> personList;
     private Long car_id;
     private String departure;
     private String back;
@@ -60,5 +62,13 @@ public class Event {
 
     public void setBack(String back) {
         this.back = back;
+    }
+
+    public List<Person> getPersonList() {
+        return personList;
+    }
+
+    public void setPersonList(List<Person> personList) {
+        this.personList = personList;
     }
 }

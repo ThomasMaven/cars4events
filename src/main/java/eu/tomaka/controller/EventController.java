@@ -1,6 +1,7 @@
 package eu.tomaka.controller;
 
 import eu.tomaka.model.Event;
+import eu.tomaka.model.Person;
 import eu.tomaka.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/")
+@RequestMapping("api/v1/event")
 public class EventController {
     @Autowired
     EventService eventService;
@@ -18,9 +19,13 @@ public class EventController {
         return eventService.findAll();
     }
 
-    @RequestMapping(value = "event", method = RequestMethod.POST)
-    public Event createPerson(@RequestBody Event event) {
+    @PostMapping
+    public Event createEvent(@RequestBody Event event) {
         return eventService.createEvent(event);
     }
 
+    @PostMapping(value = "{id}/addPerson")
+    public Event addPerson(@PathVariable Long id, @RequestBody Person person) {
+        return eventService.addPerson(id, person);
+    }
 }
