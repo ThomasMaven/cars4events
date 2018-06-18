@@ -9,7 +9,7 @@ public class Person {
     private Long id;
     private String name;
     private String surname;
-    @Column(unique=true, name = "fb_id")
+    @Column(unique=true)
     private String fbid;
     private String email;
 

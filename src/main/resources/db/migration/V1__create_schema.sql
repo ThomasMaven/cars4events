@@ -3,7 +3,7 @@ CREATE TABLE public.person
   id serial NOT NULL ,
   name character varying(100),
   surname character varying(100),
-  fb_id character varying(100),
+  fbid character varying(100),
   email character varying(100),
 
   CONSTRAINT person_pkey PRIMARY KEY (id)
