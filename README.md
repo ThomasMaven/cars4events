@@ -2,3 +2,5 @@
 
 # cars4events
 Application that helps people to get together to various events.
+
+Swagger-UI url: https://host:port/swagger-ui.html
