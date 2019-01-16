@@ -1,0 +1,362 @@
+Index: src/main/java/eu/tomaka/model/Event.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/eu/tomaka/model/Event.java	(revision 8811dd03a21bf9ba1fbb07f5225a8999f4d22a21)
++++ src/main/java/eu/tomaka/model/Event.java	(date 1529326353213)
+@@ -9,10 +9,14 @@
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+     private Long id;
+     private String name;
+-    private Long owner_id;
++
++    @ManyToOne(cascade = CascadeType.ALL)
++    private Person owner;
+     @OneToMany(cascade = CascadeType.ALL)
+     private List<Person> personList;
+-    private Long car_id;
++
++    @OneToOne(cascade = CascadeType.ALL)
++    private Car car;
+     private String departure;
+     private String back;
+ 
+@@ -32,20 +36,20 @@
+         this.name = name;
+     }
+ 
+-    public Long getOwner_id() {
+-        return owner_id;
++    public Person getOwner() {
++        return owner;
+     }
+ 
+-    public void setOwner_id(Long owner_id) {
+-        this.owner_id = owner_id;
++    public void setOwner(Person owner) {
++        this.owner = owner;
+     }
+ 
+-    public Long getCar_id() {
+-        return car_id;
++    public Car getCar() {
++        return car;
+     }
+ 
+-    public void setCar_id(Long car_id) {
+-        this.car_id = car_id;
++    public void setCar(Car car) {
++        this.car = car;
+     }
+ 
+     public String getDeparture() {
+Index: src/test/java/eu/tomaka/EventControllerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/eu/tomaka/EventControllerTest.java	(revision 8811dd03a21bf9ba1fbb07f5225a8999f4d22a21)
++++ src/test/java/eu/tomaka/EventControllerTest.java	(date 1529325196967)
+@@ -1,8 +1,6 @@
+ package eu.tomaka;
+ 
+ import eu.tomaka.controller.EventController;
+-import eu.tomaka.model.Event;
+-import eu.tomaka.model.Person;
+ import eu.tomaka.service.EventService;
+ import org.hamcrest.Matchers;
+ import org.junit.Before;
+@@ -11,23 +9,18 @@
+ import org.mockito.InjectMocks;
+ import org.mockito.Mock;
+ import org.mockito.MockitoAnnotations;
+-import org.springframework.boot.test.context.SpringBootTest;
++import org.mockito.runners.MockitoJUnitRunner;
+ import org.springframework.http.MediaType;
+-import org.springframework.test.context.junit4.SpringRunner;
+ import org.springframework.test.web.servlet.MockMvc;
+ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+ 
+-import java.util.ArrayList;
+-import java.util.List;
+-
+ import static org.hamcrest.Matchers.hasSize;
+ import static org.hamcrest.Matchers.is;
+ import static org.mockito.Mockito.*;
+ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+ 
+-@RunWith(SpringRunner.class)
+-@SpringBootTest
++@RunWith(MockitoJUnitRunner.class)
+ public class EventControllerTest {
+ 
+     private MockMvc mockMvc;
+@@ -38,41 +31,26 @@
+     @Mock
+     private EventService eventService;
+ 
+-    List<Person> mockedPersonList = getMockedPersonList();
++    TestEvents testEvents = new TestEvents();
+ 
+     @Before
+     public void init() {
+-        MockitoAnnotations.initMocks(this);
+         mockMvc = MockMvcBuilders.standaloneSetup(eventController).build();
+     }
+ 
+     @Test
+     public void testGetEventList() throws Exception {
+-        List<Event> events = new ArrayList<>();
+-        for(int i=0;i<3;i++) {
+-            Event tmpEvent = new Event();
+-            tmpEvent.setDeparture("01.01.2018");
+-            tmpEvent.setBack("02.01.2018");
+-            tmpEvent.setPersonList(mockedPersonList);
+-            events.add(tmpEvent);
+-        }
+-        when(eventService.findAll()).thenReturn(events);
++        when(eventService.findAll()).thenReturn(testEvents.getEvents(3));
++
+         mockMvc.perform(get("/api/v1/event")).andExpect(status().isOk())
+-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+-            .andExpect(jsonPath("$", hasSize(3)))
+-            .andExpect(jsonPath("$[0].departure", is("01.01.2018")))
+-            .andExpect(jsonPath("$[0].back", is("02.01.2018")))
+-            .andExpect(jsonPath("$[0].personList", Matchers.hasSize(4)));
++                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
++                .andExpect(jsonPath("$", hasSize(3)))
++                .andExpect(jsonPath("$[0].departure", is("01.01.2018")))
++                .andExpect(jsonPath("$[0].back", is("02.01.2018")))
++                .andExpect(jsonPath("$[0].personList", Matchers.hasSize(4)));
+         verify(eventService).findAll();
+         verifyNoMoreInteractions(eventService);
+     }
+ 
+-    private List<Person> getMockedPersonList(){
+-        List<Person> personList = new ArrayList<>();
+-        for(int i=0; i<4; i++) {
+-            Person person = new Person("name" + i, "surname" + i, "00" + i, i + "@example.com" );
+-            personList.add(person);
+-        }
+-        return personList;
+-    }
++
+ }
+Index: src/main/java/eu/tomaka/model/Car.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/eu/tomaka/model/Car.java	(revision 8811dd03a21bf9ba1fbb07f5225a8999f4d22a21)
++++ src/main/java/eu/tomaka/model/Car.java	(date 1529325827439)
+@@ -12,4 +12,36 @@
+     //TODO: set constraints
+     @ManyToOne
+     private SeatSchema seatSchema;
++
++    public Long getId() {
++        return id;
++    }
++
++    public void setId(Long id) {
++        this.id = id;
++    }
++
++    public String getBrand() {
++        return brand;
++    }
++
++    public void setBrand(String brand) {
++        this.brand = brand;
++    }
++
++    public String getModel() {
++        return model;
++    }
++
++    public void setModel(String model) {
++        this.model = model;
++    }
++
++    public SeatSchema getSeatSchema() {
++        return seatSchema;
++    }
++
++    public void setSeatSchema(SeatSchema seatSchema) {
++        this.seatSchema = seatSchema;
++    }
+ }
+Index: src/test/java/eu/tomaka/TestEvents.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/eu/tomaka/TestEvents.java	(date 1529325111312)
++++ src/test/java/eu/tomaka/TestEvents.java	(date 1529325111312)
+@@ -0,0 +1,32 @@
++package eu.tomaka;
++
++import eu.tomaka.model.Event;
++import eu.tomaka.model.Person;
++
++import java.util.ArrayList;
++import java.util.List;
++
++public class TestEvents {
++
++    public List<Event> getEvents(int size) {
++        List<Event> events = new ArrayList<>();
++        for (int i = 0; i < size; i++) {
++            Event tmpEvent = new Event();
++            tmpEvent.setDeparture("01.01.2018");
++            tmpEvent.setBack("02.01.2018");
++            tmpEvent.setPersonList(getMockedPersonList());
++            events.add(tmpEvent);
++        }
++
++        return events;
++    }
++
++    public List<Person> getMockedPersonList() {
++        List<Person> personList = new ArrayList<>();
++        for (int i = 0; i < 4; i++) {
++            Person person = new Person("name" + i, "surname" + i, "00" + i, i + "@example.com");
++            personList.add(person);
++        }
++        return personList;
++    }
++}
+Index: src/main/resources/application.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/resources/application.properties	(revision 8811dd03a21bf9ba1fbb07f5225a8999f4d22a21)
++++ src/main/resources/application.properties	(date 1529324100373)
+@@ -1,6 +1,4 @@
+ server.port=8888
+-spring.social.facebook.appId=changeMe
+-spring.social.facebook.appSecret=changeMe
+ security.require-ssl=true
+ server.ssl.key-store: .keystore
+ server.ssl.key-store-password: 123456
+Index: src/test/java/eu/tomaka/controller/AnotherEventControllerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/eu/tomaka/controller/AnotherEventControllerTest.java	(date 1529326429837)
++++ src/test/java/eu/tomaka/controller/AnotherEventControllerTest.java	(date 1529326429837)
+@@ -0,0 +1,47 @@
++package eu.tomaka.controller;
++
++import eu.tomaka.model.Car;
++import eu.tomaka.model.Event;
++import eu.tomaka.model.Person;
++import eu.tomaka.model.SeatSchema;
++import eu.tomaka.repo.EventRepo;
++import eu.tomaka.repo.PersonRepo;
++import org.junit.Assert;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.boot.test.context.SpringBootTest;
++import org.springframework.test.annotation.Rollback;
++import org.springframework.test.context.junit4.SpringRunner;
++
++@RunWith(SpringRunner.class)
++@SpringBootTest
++public class AnotherEventControllerTest {
++
++    @Autowired
++    EventController eventController;
++
++    @Autowired
++    EventRepo repo;
++
++
++    @Test
++    @Rollback
++    public void name() {
++        Event testEvent = new Event();
++
++        Person person = new Person();
++        Car car = new Car();
++        SeatSchema schema = new SeatSchema();
++
++        car.setSeatSchema(schema);
++        testEvent.setOwner(person);
++        testEvent.setCar(car);
++
++        Event event = eventController.createEvent(testEvent);
++
++        Assert.assertNotNull(repo.getOne(event.getId()));
++
++
++    }
++}
+\ No newline at end of file
+Index: src/main/java/eu/tomaka/controller/CreateEventCommand.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/eu/tomaka/controller/CreateEventCommand.java	(date 1529326648362)
++++ src/main/java/eu/tomaka/controller/CreateEventCommand.java	(date 1529326648362)
+@@ -0,0 +1,8 @@
++package eu.tomaka.controller;
++
++import java.time.LocalDate;
++
++public class CreateEventCommand {
++    private String name;
++    private LocalDate from;
++}
+Index: src/main/java/eu/tomaka/MainController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/eu/tomaka/MainController.java	(revision 8811dd03a21bf9ba1fbb07f5225a8999f4d22a21)
++++ src/main/java/eu/tomaka/MainController.java	(date 1529324608112)
+@@ -2,7 +2,6 @@
+ 
+ import eu.tomaka.model.Person;
+ import eu.tomaka.service.PersonService;
+-import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.boot.SpringApplication;
+ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+ import org.springframework.boot.autoconfigure.SpringBootApplication;
+@@ -23,25 +22,25 @@
+ @RequestMapping("/")
+ public class MainController {
+ 
+-    @Autowired
+-    PersonService personService;
+ 
+     private Facebook facebook;
+     private ConnectionRepository connectionRepository;
++    private PersonService personService;
+ 
+-    public MainController(Facebook facebook, ConnectionRepository connectionRepository) {
++    public MainController(Facebook facebook, ConnectionRepository connectionRepository, PersonService personService) {
+         this.facebook = facebook;
+         this.connectionRepository = connectionRepository;
++        this.personService = personService;
+     }
+ 
+     @GetMapping
+     public String home(Model model) {
+-        if(connectionRepository.findPrimaryConnection(Facebook.class) == null || !facebook.isAuthorized()) {
++        if (connectionRepository.findPrimaryConnection(Facebook.class) == null || !facebook.isAuthorized()) {
+             return "redirect:/connect/facebook";
+         }
+ 
+         model.addAttribute("authorized", facebook.isAuthorized());
+-        String [] fields = { "id", "email", "first_name", "last_name" };
++        String[] fields = {"id", "email", "first_name", "last_name"};
+         User profile = facebook.fetchObject("me", User.class, fields);
+         model.addAttribute("id", profile.getId());
+         model.addAttribute("first_name", profile.getFirstName());
