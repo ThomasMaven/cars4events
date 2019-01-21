@@ -22,8 +22,6 @@ import javax.persistence.PersistenceContext;
 @Transactional
 public class AnotherEventControllerTest {
 
-    @PersistenceContext
-    EntityManager em;
 
     @Autowired
     EventController eventController;
