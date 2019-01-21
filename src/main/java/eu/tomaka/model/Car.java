@@ -9,7 +9,8 @@ public class Car {
     private Long id;
     private String brand;
     private String model;
-    private Long seatSchemaId;
+    @ManyToOne
+    private SeatSchema seatSchema;
 
     public Long getId() {
         return id;
@@ -35,11 +36,11 @@ public class Car {
         this.model = model;
     }
 
-    public Long getSeatSchemaId() {
-        return seatSchemaId;
+    public SeatSchema getSeatSchema() {
+        return seatSchema;
     }
 
-    public void setSeatSchemaId(Long seatSchemaId) {
-        this.seatSchemaId = seatSchemaId;
+    public void setSeatSchema(SeatSchema seatSchema) {
+        this.seatSchema = seatSchema;
     }
 }

@@ -9,10 +9,12 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private Long owner_id;
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Person owner;
     @OneToMany(cascade = CascadeType.ALL)
     private List<Person> personList;
-    private Long car_id;
+    @OneToOne(cascade =  CascadeType.ALL)
+    private Car car;
     private String departure;
     private String back;
 
@@ -32,22 +34,6 @@ public class Event {
         this.name = name;
     }
 
-    public Long getOwner_id() {
-        return owner_id;
-    }
-
-    public void setOwner_id(Long owner_id) {
-        this.owner_id = owner_id;
-    }
-
-    public Long getCar_id() {
-        return car_id;
-    }
-
-    public void setCar_id(Long car_id) {
-        this.car_id = car_id;
-    }
-
     public String getDeparture() {
         return departure;
     }
@@ -58,6 +44,22 @@ public class Event {
 
     public String getBack() {
         return back;
+    }
+
+    public Person getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Person owner) {
+        this.owner = owner;
+    }
+
+    public Car getCar() {
+        return car;
+    }
+
+    public void setCar(Car car) {
+        this.car = car;
     }
 
     public void setBack(String back) {

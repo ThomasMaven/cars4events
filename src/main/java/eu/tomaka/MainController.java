@@ -2,7 +2,6 @@ package eu.tomaka;
 
 import eu.tomaka.model.Person;
 import eu.tomaka.service.PersonService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,25 +22,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/")
 public class MainController {
 
-    @Autowired
-    PersonService personService;
 
     private Facebook facebook;
     private ConnectionRepository connectionRepository;
+    private PersonService personService;
 
-    public MainController(Facebook facebook, ConnectionRepository connectionRepository) {
+    public MainController(Facebook facebook, ConnectionRepository connectionRepository, PersonService personService) {
         this.facebook = facebook;
         this.connectionRepository = connectionRepository;
+        this.personService = personService;
     }
 
     @GetMapping
     public String home(Model model) {
-        if(connectionRepository.findPrimaryConnection(Facebook.class) == null || !facebook.isAuthorized()) {
-            return "redirect:/connect/facebook";
+        if (connectionRepository.findPrimaryConnection(Facebook.class) == null || !facebook.isAuthorized()) {
+              return "redirect:/connect/facebook";
         }
-
         model.addAttribute("authorized", facebook.isAuthorized());
-        String [] fields = { "id", "email", "first_name", "last_name" };
+        String[] fields = {"id", "email", "first_name", "last_name"};
         User profile = facebook.fetchObject("me", User.class, fields);
         model.addAttribute("id", profile.getId());
         model.addAttribute("first_name", profile.getFirstName());
