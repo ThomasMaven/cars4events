@@ -9,7 +9,7 @@ public class Car {
     private Long id;
     private String brand;
     private String model;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private SeatSchema seatSchema;
 
     public Long getId() {
