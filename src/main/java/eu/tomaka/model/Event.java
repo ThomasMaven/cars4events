@@ -1,6 +1,7 @@
 package eu.tomaka.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,8 +13,8 @@ public class Event {
     @ManyToOne(cascade = CascadeType.ALL)
     private Person owner;
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Person> personList;
-    @OneToOne(cascade =  CascadeType.ALL)
+    private List<Person> personList = new ArrayList<>();
+    @OneToOne(cascade = CascadeType.ALL)
     private Car car;
     private String departure;
     private String back;
